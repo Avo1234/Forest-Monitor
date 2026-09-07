@@ -1,9 +1,21 @@
 import ee
 import json
+import os
 from datetime import datetime, timedelta
 
-# Initialize Earth Engine
-ee.Initialize(project='project-b4195de3-1a22-4a8b-a89')
+def init_earth_engine():
+    """Initializes Google Earth Engine with optional Service Account support for CI/CD."""
+    gee_sa = os.environ.get('GEE_SERVICE_ACCOUNT')
+    gee_key = os.environ.get('GEE_SERVICE_ACCOUNT_KEY')
+    project_id = os.environ.get('GEE_PROJECT', 'project-b4195de3-1a22-4a8b-a89')
+
+    if gee_sa and gee_key:
+        credentials = ee.ServiceAccountCredentials(gee_sa, key_data=gee_key)
+        ee.Initialize(credentials, project=project_id)
+    else:
+        ee.Initialize(project=project_id)
+
+init_earth_engine()
 
 def run_weekly_deforestation_job():
     today = datetime.utcnow().date()
